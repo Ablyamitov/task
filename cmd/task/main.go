@@ -5,6 +5,7 @@ import (
 	"github.com/Ablyamitov/task/internal/config"
 	"github.com/Ablyamitov/task/internal/handler"
 	fiberserver "github.com/Ablyamitov/task/internal/server"
+	"github.com/Ablyamitov/task/internal/storage/db/postgres"
 	"github.com/Ablyamitov/task/internal/storage/repository"
 	"log"
 	"os"
@@ -19,7 +20,12 @@ func main() {
 		log.Fatalf("Could not load config: %v", err)
 	}
 
-	userRepository := repository.NewUserRepository(nil)
+	db, err := postgres.Connect(conf.DB.URL)
+	if err != nil {
+		log.Fatalf("Could not connect to db: %v", err)
+	}
+
+	userRepository := repository.NewUserRepository(db)
 	authHandler := handler.NewAuthHandler(userRepository)
 
 	taskServer := fiberserver.NewServer(conf.Host, conf.Port, authHandler)

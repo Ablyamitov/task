@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	"github.com/Ablyamitov/task/internal/storage/repository"
 	"github.com/Ablyamitov/task/internal/web/dto"
 	"github.com/Ablyamitov/task/internal/web/mapper"
@@ -32,7 +33,7 @@ func (authHandler *authHandler) Register(c *fiber.Ctx) error {
 	user := mapper.MapUserDTOToUser(&userDTO)
 
 	if err := authHandler.UserRepository.Create(context.Background(), user); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to create movie"})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": fmt.Sprintf("Failed to create movie: %v", err)})
 	}
 
 	response := mapper.MapUserToUserDTO(user)

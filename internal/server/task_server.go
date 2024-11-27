@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"github.com/Ablyamitov/task/internal/handler"
 	"github.com/gofiber/fiber/v2"
 	fiberLogger "github.com/gofiber/fiber/v2/middleware/logger"
 	"log"
@@ -20,9 +21,12 @@ type TaskServer struct {
 	port int
 }
 
-func NewServer(host string, port int) Server {
+func NewServer(host string, port int, authHandler handler.AuthHandler) Server {
 	app := fiber.New()
 	app.Use(fiberLogger.New())
+
+	app.Post("/register", authHandler.Register)
+
 	server := &TaskServer{
 		app:  app,
 		host: host,

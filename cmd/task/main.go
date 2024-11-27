@@ -3,7 +3,9 @@ package main
 import (
 	"context"
 	"github.com/Ablyamitov/task/internal/config"
+	"github.com/Ablyamitov/task/internal/handler"
 	fiberserver "github.com/Ablyamitov/task/internal/server"
+	"github.com/Ablyamitov/task/internal/storage/repository"
 	"log"
 	"os"
 	"os/signal"
@@ -17,7 +19,10 @@ func main() {
 		log.Fatalf("Could not load config: %v", err)
 	}
 
-	taskServer := fiberserver.NewServer(conf.Host, conf.Port)
+	userRepository := repository.NewUserRepository(nil)
+	authHandler := handler.NewAuthHandler(userRepository)
+
+	taskServer := fiberserver.NewServer(conf.Host, conf.Port, authHandler)
 	taskServer.Run()
 	waitForShutdown(taskServer)
 }

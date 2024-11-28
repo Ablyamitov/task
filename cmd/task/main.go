@@ -26,9 +26,10 @@ func main() {
 	}
 
 	userRepository := repository.NewUserRepository(db)
-	authHandler := handler.NewAuthHandler(userRepository)
+	authHandler := handler.NewAuthHandler(userRepository, conf.App.Secret)
+	adminHandler := handler.NewAdminHandler(userRepository)
 
-	taskServer := fiberserver.NewServer(conf.Host, conf.Port, authHandler)
+	taskServer := fiberserver.NewServer(conf.Host, conf.Port, conf.App.Secret, authHandler, adminHandler)
 	taskServer.Run()
 	waitForShutdown(taskServer)
 }

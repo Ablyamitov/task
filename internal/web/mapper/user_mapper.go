@@ -13,6 +13,7 @@ func MapUserToUserDTO(user *model.User) *response.UserDTO {
 		Gender:    user.Gender,
 		BirthDate: user.BirthDate,
 		Phone:     user.Phone,
+		Role:      user.Role,
 	}
 }
 
@@ -24,5 +25,6 @@ func MapUserDTOToUser(dto *response.UserDTO) *model.User {
 		Gender:    dto.Gender,
 		BirthDate: dto.BirthDate,
 		Phone:     dto.Phone,
+		Role:      dto.Role,
 	}
 }

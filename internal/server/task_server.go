@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/Ablyamitov/task/internal/handler"
+	"github.com/Ablyamitov/task/internal/middleware"
 	"github.com/gofiber/fiber/v2"
 	fiberLogger "github.com/gofiber/fiber/v2/middleware/logger"
 	"log"
@@ -21,11 +22,14 @@ type TaskServer struct {
 	port int
 }
 
-func NewServer(host string, port int, authHandler handler.AuthHandler) Server {
+func NewServer(host string, port int, secret string, authHandler handler.AuthHandler, adminHandler handler.AdminHandler) Server {
 	app := fiber.New()
 	app.Use(fiberLogger.New())
 
 	app.Post("/register", authHandler.Register)
+	app.Post("/login", authHandler.Login)
+
+	app.Get("/users", middleware.IsAdmin(secret), adminHandler.Users)
 
 	server := &TaskServer{
 		app:  app,

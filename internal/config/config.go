@@ -9,6 +9,7 @@ import (
 type Config struct {
 	Server `yaml:"server"`
 	DB     `yaml:"db"`
+	App    `yaml:"app"`
 }
 
 type Server struct {
@@ -18,6 +19,10 @@ type Server struct {
 
 type DB struct {
 	URL string `yaml:"url" env-required:"true"`
+}
+
+type App struct {
+	Secret string `yaml:"secret"`
 }
 
 func LoadConfig() (*Config, error) {

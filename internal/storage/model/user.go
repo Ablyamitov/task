@@ -7,4 +7,5 @@ type User struct {
 	Gender    string `db:"gender"`
 	BirthDate string `db:"birth_date"`
 	Phone     string `db:"phone"`
+	Role      string `db:"role"`
 }

@@ -7,4 +7,5 @@ type UserDTO struct {
 	Gender    string `json:"gender"`
 	BirthDate string `json:"birth_date"`
 	Phone     string `json:"phone"`
+	Role      string `json:"role"`
 }

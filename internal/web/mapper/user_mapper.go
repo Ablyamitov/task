@@ -2,11 +2,11 @@ package mapper
 
 import (
 	"github.com/Ablyamitov/task/internal/storage/model"
-	"github.com/Ablyamitov/task/internal/web/dto"
+	"github.com/Ablyamitov/task/internal/web/response"
 )
 
-func MapUserToUserDTO(user *model.User) *dto.UserDTO {
-	return &dto.UserDTO{
+func MapUserToUserDTO(user *model.User) *response.UserDTO {
+	return &response.UserDTO{
 		ID:        user.ID,
 		LastName:  user.LastName,
 		FirstName: user.FirstName,
@@ -16,7 +16,7 @@ func MapUserToUserDTO(user *model.User) *dto.UserDTO {
 	}
 }
 
-func MapUserDTOToUser(dto *dto.UserDTO) *model.User {
+func MapUserDTOToUser(dto *response.UserDTO) *model.User {
 	return &model.User{
 		ID:        dto.ID,
 		LastName:  dto.LastName,

@@ -40,4 +40,5 @@ func waitForShutdown(taskServer fiberserver.Server) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	taskServer.Stop(ctx)
+
 }

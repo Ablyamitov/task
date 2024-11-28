@@ -2,11 +2,13 @@ package handler
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/Ablyamitov/task/internal/storage/repository"
-	"github.com/Ablyamitov/task/internal/web/dto"
 	"github.com/Ablyamitov/task/internal/web/mapper"
+	"github.com/Ablyamitov/task/internal/web/response"
 	"github.com/gofiber/fiber/v2"
+	"log"
 )
 
 type AuthHandler interface {
@@ -15,7 +17,6 @@ type AuthHandler interface {
 
 type authHandler struct {
 	UserRepository repository.UserRepository
-	Secret         string
 }
 
 func NewAuthHandler(userRepository repository.UserRepository) AuthHandler {
@@ -23,20 +24,46 @@ func NewAuthHandler(userRepository repository.UserRepository) AuthHandler {
 }
 
 func (authHandler *authHandler) Register(c *fiber.Ctx) error {
-
-	var userDTO dto.UserDTO
+	method := "AuthHandler:Register"
+	var userDTO response.UserDTO
+	var Errors []string
 
 	if err := c.BodyParser(&userDTO); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid input"})
+
+		log.Printf(fmt.Sprintf("%s: Invalid input: %v", method, err))
+		Errors = append(Errors, "invalid input")
+		return c.Status(fiber.StatusBadRequest).JSON(
+			response.SavedResponse{
+				Status: false,
+				Errors: &Errors,
+			})
 	}
 
 	user := mapper.MapUserDTOToUser(&userDTO)
 
 	if err := authHandler.UserRepository.Create(context.Background(), user); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": fmt.Sprintf("Failed to create movie: %v", err)})
+		log.Printf(fmt.Sprintf("%s: Failed to create user: %v", method, err))
+		Errors = append(Errors, "failed to create user")
+		if errors.Is(err, repository.ErrUserAlreadyExist) {
+			Errors = append(Errors, repository.ErrUserAlreadyExist.Error())
+			return c.Status(fiber.StatusConflict).JSON(
+				response.SavedResponse{
+					Status: false,
+					Errors: &Errors,
+				})
+		}
+		return c.Status(fiber.StatusInternalServerError).JSON(
+			response.SavedResponse{
+				Status: false,
+				Errors: &Errors,
+			})
+
 	}
 
-	response := mapper.MapUserToUserDTO(user)
-	return c.Status(fiber.StatusCreated).JSON(response)
+	return c.Status(fiber.StatusCreated).JSON(
+		response.SavedResponse{
+			Data:   &response.Saved{Status: true},
+			Status: true,
+		})
 
 }

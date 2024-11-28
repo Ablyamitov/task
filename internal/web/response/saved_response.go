@@ -1,4 +1,4 @@
-package dto
+package response
 
 type SavedResponse struct {
 	Data   *Saved    `json:"data"`

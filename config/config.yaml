@@ -1,0 +1,9 @@
+server:
+  port: 8080
+  host: "localhost"
+
+db:
+  url: "postgresql://postgres:12345678@localhost:5432/task"
+
+app:
+  secret: "abobaabobaaboba"

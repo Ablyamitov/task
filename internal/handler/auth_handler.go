@@ -9,6 +9,9 @@ import (
 	"github.com/Ablyamitov/task/internal/web/response"
 	"github.com/gofiber/fiber/v2"
 	"log"
+	"regexp"
+	"strings"
+	"time"
 )
 
 type AuthHandler interface {
@@ -32,6 +35,15 @@ func (authHandler *authHandler) Register(c *fiber.Ctx) error {
 
 		log.Printf(fmt.Sprintf("%s: Invalid input: %v", method, err))
 		Errors = append(Errors, "invalid input")
+		return c.Status(fiber.StatusBadRequest).JSON(
+			response.SavedResponse{
+				Status: false,
+				Errors: &Errors,
+			})
+	}
+
+	Errors = validateUserDTO(&userDTO)
+	if len(Errors) > 0 {
 		return c.Status(fiber.StatusBadRequest).JSON(
 			response.SavedResponse{
 				Status: false,
@@ -66,4 +78,31 @@ func (authHandler *authHandler) Register(c *fiber.Ctx) error {
 			Status: true,
 		})
 
+}
+
+func validateUserDTO(userDTO *response.UserDTO) []string {
+	var Errors []string
+
+	if len([]rune(userDTO.LastName)) < 2 {
+		Errors = append(Errors, "LastName must be at least 2 char")
+	}
+
+	if len([]rune(userDTO.FirstName)) < 2 {
+		Errors = append(Errors, "FirstName must be at least 2 char")
+	}
+
+	if strings.ToLower(userDTO.Gender) != "male" && strings.ToLower(userDTO.Gender) != "female" {
+		Errors = append(Errors, "Gender must be male or female")
+	}
+
+	if _, err := time.Parse("02-01-2006", userDTO.BirthDate); err != nil {
+		Errors = append(Errors, "BirthDate must be in the format 'DD-MM-YYYY'")
+	}
+
+	re := regexp.MustCompile(`^\+?[0-9]{10,15}$`)
+	if !re.MatchString(userDTO.Phone) {
+		Errors = append(Errors, "Phone must be a valid number")
+	}
+
+	return Errors
 }
